@@ -650,5 +650,3 @@ service vendor.power_off_alarm /vendor/bin/power_off_alarm
     disabled
     oneshot
 
-on property:dev.bootcomplete=1
-    swapon_all /vendor/etc/fstab.qcom
