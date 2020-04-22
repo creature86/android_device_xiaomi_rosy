@@ -236,11 +236,6 @@ TapSlop=1px
 
 
 PRODUCT_PROPERTY_OVERRIDES += \
-ro.vendor.qti.sys.fw.bservice_enable=true \
-ro.vendor.qti.am.reschedule_service=true
-
-
-PRODUCT_PROPERTY_OVERRIDES += \
 ro.vendor.extension_library=libqti-perfd-client.so \
 ro.vendor.qti.sys.fw.bg_apps_limit=60 \
 vendor.perf.gestureflingboost.enable=true
@@ -252,3 +247,11 @@ ro.vendor.qti.sys.fw.empty_app_percent=50 \
 ro.vendor.qti.sys.fw.trim_empty_percent=100 \
 ro.vendor.qti.sys.fw.trim_cache_percent=100 \
 ro.vendor.qti.sys.fw.trim_enable_memory=2147483648
+
+PRODUCT_PROPERTY_OVERRIDES += \
+dalvik.vm.heapminfree=4m \
+dalvik.vm.heapstartsize=16m \
+dalvik.vm.heapgrowthlimit=192m \
+dalvik.vm.heapsize=512m \
+dalvik.vm.heaptargetutilization=0.75 \
+dalvik.vm.heapmaxfree=8m
