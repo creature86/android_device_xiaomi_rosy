@@ -536,7 +536,7 @@ else
           *)
             #Set PPR parameters for all other targets.
             echo $set_almk_ppr_adj > /sys/module/process_reclaim/parameters/min_score_adj
-            echo 1 > /sys/module/process_reclaim/parameters/enable_process_reclaim
+            echo 0 > /sys/module/process_reclaim/parameters/enable_process_reclaim
             echo 50 > /sys/module/process_reclaim/parameters/pressure_min
             echo 70 > /sys/module/process_reclaim/parameters/pressure_max
             echo 30 > /sys/module/process_reclaim/parameters/swap_opt_eff
@@ -1850,7 +1850,7 @@ case "$target" in
                     done
                     for cpu_min_freq in /sys/class/devfreq/soc:qcom,cpubw/min_freq
                     do
-                        echo 1611 > $cpu_min_freq
+                        echo 769 > $cpu_min_freq
                     done
                 done
 
@@ -1890,7 +1890,7 @@ case "$target" in
                 else
                     8953_sched_dcvs_hmp
                 fi
-                echo 652800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+                echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
 
                 # Bring up all cores online
                 echo 1 > /sys/devices/system/cpu/cpu1/online
@@ -1949,7 +1949,7 @@ case "$target" in
             do
                 echo "bw_hwmon" > $cpubw/governor
                 echo 50 > $cpubw/polling_interval
-                echo "1611 3221 5859 6445 7104" > $cpubw/bw_hwmon/mbps_zones
+                echo "769 3221 5859 6445 7104" > $cpubw/bw_hwmon/mbps_zones
                 echo 4 > $cpubw/bw_hwmon/sample_ms
                 echo 34 > $cpubw/bw_hwmon/io_percent
                 echo 20 > $cpubw/bw_hwmon/hist_memory
