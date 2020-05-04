@@ -3046,9 +3046,6 @@ case "$target" in
             echo N > /sys/module/lpm_levels/L3/cpu6/ret/idle_enabled
             echo N > /sys/module/lpm_levels/L3/cpu7/ret/idle_enabled
 
-            # cpuset parameters
-            echo 0-5 > /dev/cpuset/background/cpus
-            echo 0-5 > /dev/cpuset/system-background/cpus
 
             # Turn off scheduler boost at the end
             echo 0 > /proc/sys/kernel/sched_boost
@@ -3200,10 +3197,6 @@ case "$target" in
       done
 
 
-            # cpuset parameters
-            echo 0-5 > /dev/cpuset/background/cpus
-            echo 0-5 > /dev/cpuset/system-background/cpus
-
             # Turn off scheduler boost at the end
             echo 0 > /proc/sys/kernel/sched_boost
 
@@ -3340,9 +3333,6 @@ case "$target" in
 
             done
 
-            # cpuset parameters
-                echo 0-5 > /dev/cpuset/background/cpus
-                echo 0-5 > /dev/cpuset/system-background/cpus
 
                 # Turn off scheduler boost at the end
                 echo 0 > /proc/sys/kernel/sched_boost
@@ -3461,9 +3451,6 @@ case "$target" in
 
             echo "cpufreq" > /sys/class/devfreq/soc:qcom,mincpubw/governor
 
-            # cpuset parameters
-            echo 0-5 > /dev/cpuset/background/cpus
-            echo 0-5 > /dev/cpuset/system-background/cpus
 
             # Turn off scheduler boost at the end
             echo 0 > /proc/sys/kernel/sched_boost
@@ -4011,9 +3998,6 @@ case "$target" in
 	echo "compute" > /sys/class/devfreq/soc:qcom,mincpubw/governor
 	echo 10 > /sys/class/devfreq/soc:qcom,mincpubw/polling_interval
 
-	# cpuset parameters
-        echo 0-3 > /dev/cpuset/background/cpus
-        echo 0-3 > /dev/cpuset/system-background/cpus
 
 	# Turn off scheduler boost at the end
         echo 0 > /proc/sys/kernel/sched_boost
@@ -4069,9 +4053,6 @@ case "$target" in
 	echo 10 > /proc/sys/kernel/sched_group_downmigrate
 	echo 1 > /proc/sys/kernel/sched_walt_rotate_big_tasks
 
-	# cpuset parameters
-	echo 0-3 > /dev/cpuset/background/cpus
-	echo 0-3 > /dev/cpuset/system-background/cpus
 
 	# Turn off scheduler boost at the end
 	echo 0 > /proc/sys/kernel/sched_boost
