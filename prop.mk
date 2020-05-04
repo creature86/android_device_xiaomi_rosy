@@ -82,6 +82,7 @@ debug.mdpcomp.logs=0 \
 debug.sf.enable_hwc_vds=1 \
 debug.sf.hw=0 \
 debug.sf.latch_unsignaled=1 \
+debug.sf.disable_backpressure=1 \
 debug.sf.recomputecrop=0 \
 dev.pm.dyn_samplingrate=1 \
 persist.demo.hdmirotationlock=false \
@@ -193,12 +194,8 @@ net.tcp.2g_init_rwnd=10
 PRODUCT_PROPERTY_OVERRIDES += \
 sys.use_fifo_ui=1
 
-# Usb
-PRODUCT_PROPERTY_OVERRIDES += \
-persist.sys.usb.config.extra=none
-
 # Wifi
-PRODUCT_PROPERTY_OVERRIDES += \
+RODUCT_PROPERTY_OVERRIDES += \
 wifi.interface=wlan0
 
 # WiFi Display
@@ -208,15 +205,11 @@ persist.sys.wfd.virtual=0
 
 
 
-
-
 PRODUCT_PROPERTY_OVERRIDES += \
-    persist.sys.usb.config=mtp,adb \
-    ro.adb.secure=0 \
-    ro.secure=0 \
-    ro.debuggable=1
-
-
+persist.sys.usb.config=mtp,adb \
+ro.adb.secure=0 \
+ro.secure=0 \
+ro.debuggable=1
 
 
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -232,11 +225,12 @@ ro.vendor.qti.sys.fw.trim_empty_percent=100 \
 ro.vendor.qti.sys.fw.trim_cache_percent=100 \
 ro.vendor.qti.sys.fw.trim_enable_memory=2147483648
 
-# Dalvik
+
+
 PRODUCT_PROPERTY_OVERRIDES += \
-dalvik.vm.heapstartsize=8m \
-dalvik.vm.heapgrowthlimit=192m \
+dalvik.vm.heapstartsize=16m \
+dalvik.vm.heapgrowthlimit=256m \
 dalvik.vm.heapsize=512m \
 dalvik.vm.heaptargetutilization=0.75 \
-dalvik.vm.heapminfree=512k \
+dalvik.vm.heapminfree=4m \
 dalvik.vm.heapmaxfree=8m
