@@ -358,9 +358,10 @@ on post-fs-data
     mkdir /data/vendor/fm 0770 system system
     chmod 0770 /data/vendor/fm
 
-    #Create IOP  deamon related dirs
-    mkdir /data/vendor/iop 0700 root system
-
+    #Create PERFD deamon related dirs
+    mkdir /data/vendor/perfd 0770 root system
+    chmod 2770 /data/vendor/perfd
+    rm /data/vendor/perfd/default_values
     # Mark the copy complete flag to not completed
     write /data/vendor/radio/copy_complete 0
     chown radio radio /data/vendor/radio/copy_complete
@@ -403,14 +404,6 @@ on post-fs-data
 
 on property:vendor.hw.fm.init=*
     write /sys/module/radio_iris_transport/parameters/fmsmd_set ${vendor.hw.fm.init}
-
-service iop /system/vendor/bin/iop
-    class main
-    user root
-    group root
-    disabled
-    socket iop seqpacket 0666 root system
-    writepid /dev/cpuset/system-background/tasks
 
 on property:sys.boot_completed=1
     write /dev/kmsg "Boot completed "
@@ -528,12 +521,6 @@ service vendor.dataadpl /system/vendor/bin/adpl
     class main
     user radio
     group radio oem_2901 diag usb net_admin
-    writepid /dev/cpuset/system-background/tasks
-
-service vendor.sensors /vendor/bin/sscrpcd
-    class core
-    user system
-    group system
     writepid /dev/cpuset/system-background/tasks
 
 service vendor.sensors.qti /vendor/bin/sensors.qti
