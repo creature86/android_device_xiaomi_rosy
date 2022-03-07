@@ -340,31 +340,22 @@ function configure_zram_parameters() {
     # Zram disk - 75% for Go devices.
     # For 512MB Go device, size = 384MB, set same for Non-Go.
     # For 1GB Go device, size = 768MB, set same for Non-Go.
-    # For >=2GB Non-Go devices, size = 50% of RAM size. Limit the size to 4GB.
+    # For >=2GB Non-Go device, size = 1GB
     # And enable lz4 zram compression for Go targets.
-
-    RamSizeGB=`echo "($MemTotal / 1048576 ) + 1" | bc`
-    zRamSizeBytes=`echo "$RamSizeGB * 1024 * 1024 * 1024 / 2" | bc`
-    zRamSizeMB=`echo "$RamSizeGB * 1024 / 2" | bc`
-    # use MB avoid 32 bit overflow
-    if [ $zRamSizeMB -gt 4096 ]; then
-        zRamSizeBytes=4294967296
-    fi
 
     if [ "$low_ram" == "true" ]; then
         echo lz4 > /sys/block/zram0/comp_algorithm
     fi
 
     if [ -f /sys/block/zram0/disksize ]; then
-        if [ -f /sys/block/zram0/use_dedup ]; then
-            echo 1 > /sys/block/zram0/use_dedup
-        fi
+        echo 1 > /sys/block/zram0/use_dedup
         if [ $MemTotal -le 524288 ]; then
             echo 402653184 > /sys/block/zram0/disksize
         elif [ $MemTotal -le 1048576 ]; then
             echo 805306368 > /sys/block/zram0/disksize
         else
-            echo $zRamSizeBytes > /sys/block/zram0/disksize
+            # Set Zram disk size=1GB for >=2GB Non-Go targets.
+            echo 1073741824 > /sys/block/zram0/disksize
         fi
         mkswap /dev/block/zram0
         swapon /dev/block/zram0 -p 32758
@@ -1850,7 +1841,7 @@ case "$target" in
                     done
                     for cpu_min_freq in /sys/class/devfreq/soc:qcom,cpubw/min_freq
                     do
-                        echo 769 > $cpu_min_freq
+                        echo 1611 > $cpu_min_freq
                     done
                 done
 
@@ -1890,7 +1881,7 @@ case "$target" in
                 else
                     8953_sched_dcvs_hmp
                 fi
-                echo 0 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+                echo 652800 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
 
                 # Bring up all cores online
                 echo 1 > /sys/devices/system/cpu/cpu1/online
@@ -1949,7 +1940,7 @@ case "$target" in
             do
                 echo "bw_hwmon" > $cpubw/governor
                 echo 50 > $cpubw/polling_interval
-                echo "769 3221 5859 6445 7104" > $cpubw/bw_hwmon/mbps_zones
+                echo "1611 3221 5859 6445 7104" > $cpubw/bw_hwmon/mbps_zones
                 echo 4 > $cpubw/bw_hwmon/sample_ms
                 echo 34 > $cpubw/bw_hwmon/io_percent
                 echo 20 > $cpubw/bw_hwmon/hist_memory
@@ -2033,6 +2024,9 @@ case "$target" in
             echo 614400 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
             echo 633600 > /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
 
+            # cpuset settings
+            echo 0-3 > /dev/cpuset/background/cpus
+            echo 0-3 > /dev/cpuset/system-background/cpus
             # choose idle CPU for top app tasks
             echo 1 > /dev/stune/top-app/schedtune.prefer_idle
 
@@ -2372,6 +2366,9 @@ case "$target" in
                      echo 140 > /proc/sys/kernel/sched_group_upmigrate
                      echo 120 > /proc/sys/kernel/sched_group_downmigrate
 
+                     # cpuset settings
+                     #echo 0-3 > /dev/cpuset/background/cpus
+                     #echo 0-3 > /dev/cpuset/system-background/cpus
 
                      # Bring up all cores online
                      echo 1 > /sys/devices/system/cpu/cpu1/online
@@ -2516,6 +2513,9 @@ case "$target" in
             echo 1 > /proc/sys/kernel/sched_prefer_sync_wakee_to_waker
             echo 20 > /proc/sys/kernel/sched_small_wakee_task_load
 
+            # cpuset settings
+            echo 0-3 > /dev/cpuset/background/cpus
+            echo 0-3 > /dev/cpuset/system-background/cpus
 
             # disable thermal bcl hotplug to switch governor
             echo 0 > /sys/module/msm_thermal/core_control/enabled
@@ -2656,6 +2656,9 @@ case "$target" in
             echo 1 > /proc/sys/kernel/sched_restrict_cluster_spill
             echo 50000 > /proc/sys/kernel/sched_short_burst_ns
 
+            # cpuset settings
+            echo 0-3 > /dev/cpuset/background/cpus
+            echo 0-3 > /dev/cpuset/system-background/cpus
 
             # disable thermal bcl hotplug to switch governor
             echo 0 > /sys/module/msm_thermal/core_control/enabled
@@ -2818,6 +2821,10 @@ case "$target" in
             echo 77 > /proc/sys/kernel/sched_upmigrate
             echo 85 > /proc/sys/kernel/sched_group_downmigrate
             echo 100 > /proc/sys/kernel/sched_group_upmigrate
+
+            # cpuset settings
+            echo 0-3 > /dev/cpuset/background/cpus
+            echo 0-3 > /dev/cpuset/system-background/cpus
 
 
             # configure governor settings for little cluster
@@ -3046,6 +3053,9 @@ case "$target" in
             echo N > /sys/module/lpm_levels/L3/cpu6/ret/idle_enabled
             echo N > /sys/module/lpm_levels/L3/cpu7/ret/idle_enabled
 
+            # cpuset parameters
+            echo 0-5 > /dev/cpuset/background/cpus
+            echo 0-5 > /dev/cpuset/system-background/cpus
 
             # Turn off scheduler boost at the end
             echo 0 > /proc/sys/kernel/sched_boost
@@ -3116,7 +3126,6 @@ case "$target" in
         echo 576000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
       fi
 
-
       # configure governor settings for big cluster
       echo "schedutil" > /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor
       echo 0 > /sys/devices/system/cpu/cpu6/cpufreq/schedutil/up_rate_limit_us
@@ -3125,7 +3134,6 @@ case "$target" in
       if [ $sku_identified != 1 ]; then
         echo 768000 > /sys/devices/system/cpu/cpu6/cpufreq/scaling_min_freq
       fi
-
 
       # sched_load_boost as -6 is equivalent to target load as 85. It is per cpu tunable.
       echo -6 >  /sys/devices/system/cpu/cpu6/sched_load_boost
@@ -3198,6 +3206,10 @@ case "$target" in
 
       done
 
+
+            # cpuset parameters
+            echo 0-5 > /dev/cpuset/background/cpus
+            echo 0-5 > /dev/cpuset/system-background/cpus
 
             # Turn off scheduler boost at the end
             echo 0 > /proc/sys/kernel/sched_boost
@@ -3335,6 +3347,9 @@ case "$target" in
 
             done
 
+            # cpuset parameters
+                echo 0-5 > /dev/cpuset/background/cpus
+                echo 0-5 > /dev/cpuset/system-background/cpus
 
                 # Turn off scheduler boost at the end
                 echo 0 > /proc/sys/kernel/sched_boost
@@ -3453,6 +3468,9 @@ case "$target" in
 
             echo "cpufreq" > /sys/class/devfreq/soc:qcom,mincpubw/governor
 
+            # cpuset parameters
+            echo 0-5 > /dev/cpuset/background/cpus
+            echo 0-5 > /dev/cpuset/system-background/cpus
 
             # Turn off scheduler boost at the end
             echo 0 > /proc/sys/kernel/sched_boost
@@ -4000,6 +4018,9 @@ case "$target" in
 	echo "compute" > /sys/class/devfreq/soc:qcom,mincpubw/governor
 	echo 10 > /sys/class/devfreq/soc:qcom,mincpubw/polling_interval
 
+	# cpuset parameters
+        echo 0-3 > /dev/cpuset/background/cpus
+        echo 0-3 > /dev/cpuset/system-background/cpus
 
 	# Turn off scheduler boost at the end
         echo 0 > /proc/sys/kernel/sched_boost
@@ -4055,6 +4076,9 @@ case "$target" in
 	echo 10 > /proc/sys/kernel/sched_group_downmigrate
 	echo 1 > /proc/sys/kernel/sched_walt_rotate_big_tasks
 
+	# cpuset parameters
+	echo 0-3 > /dev/cpuset/background/cpus
+	echo 0-3 > /dev/cpuset/system-background/cpus
 
 	# Turn off scheduler boost at the end
 	echo 0 > /proc/sys/kernel/sched_boost
@@ -4533,6 +4557,12 @@ case "$target" in
     ;;
     "msm8937" | "msm8953")
         setprop vendor.post_boot.parsed 1
+
+        low_ram_enable=`getprop ro.config.low_ram`
+
+        if [ "$low_ram_enable" != "true" ]; then
+        start gamed
+        fi
     ;;
     "msm8974")
         start mpdecision
